@@ -1,33 +1,8 @@
 <html>
   <head>
     <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-    <title>One-day or day-one, it's your call.</title>
+    <title>One-day or Day-one? You decide.</title>
     <script src="https://unpkg.com/vue"></script>
-
-    <script type="text/x-template" id="grid-template">
-      <table v-if="filteredData.length">
-        <thead>
-          <tr>
-            <th v-for="key in columns"
-              @click="sortBy(key)"
-              :class="{ active: sortKey == key }">
-              {{ key | capitalize }}
-              <span class="arrow" :class="sortOrders[key] > 0 ? 'asc' : 'dsc'">
-              </span>
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="entry in filteredData">
-            <td v-for="key in columns">
-              {{ entry[key] | enrich }}
-            </td>
-          </tr>
-        </tbody>
-      </table>
-      <p v-else>No matches found.</p>
-    </script>
-
 
     <style type="text/css">
       body {
@@ -39,28 +14,32 @@
         border: 1px solid red;
         padding: 10px;
         width: 93%;
-        height: 340px;
+        height: 26rem;
       }
-      #lefty {
+      #goals-grid-view {
         display: inline-block;
         float: left;
         width: 34rem;
+        height: 20rem;
         border: 1px solid darkgray;
         margin-right: 1rem;
         padding: 1rem;
       }
-      #righty {
+      #goal-detail-view {
         display: inline-block;
         width: 13rem;
+        height: 13rem;
         border: 1px solid gray;
         padding: 1rem;
       }
       table, td, tr {
         text-align: center;
       }
-
       table {
         width: 100%;
+      }
+      tr.selected {
+        background-color: blue;
       }
     </style>
   </head>
@@ -69,24 +48,36 @@
 
     <div id="application">
       <p>It all begins <strong>here</strong> and <strong>now</strong> or it does not begin at all.</p>
-      <div id="lefty">
-        <tags-grid
-          :data="tagData"
-          :columns="tagColumns">
-        </tags-grid>
-      </div>
-      <div id="righty">
-        <p>right view</p>
-        <hr>
-        <table style="width: 100%">
-          <tr><td>^</td></tr>
-          <tr><td>August 15</td></tr>
-          <tr><td>30 days</td></tr>
-          <tr><td>v</td></tr>
-          <tr><td>&nbsp;</td></tr>
-          <tr><td>check button</td></tr>
+      <div id="goals-grid-view">
+        <table>
+          <thead>
+            <tr>
+              <th v-for="key in showColumns">
+                {{ key | capitalize }}
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="goal in tagData"
+                    v-on:click="onRowClick"
+                    v-bind:id="goal.id"
+                    v-bind:class="{'selected': (goal.id == selected.id)}">
+              <td>{{ "#"+goal.goal }}</td>
+              <td>{{ goal.streak+" days" }}</td>
+              <td>{{ prettyDate(goal.started) }}</td>
+            </tr>
+          </tbody>
         </table>
-        <hr>
+      </div>
+
+      <div id="goal-detail-view">
+        <table v-if="selected.id">
+          <tr><td>{{ "#"+selected.goal }}</td></tr>
+          <tr><td>{{ selected.streak+" days" }}</td></tr>
+          <tr><td>{{ "since "+prettyDate(selected.started) }}</td></tr>
+          <tr><td>&nbsp;</td></tr>
+          <tr><td> <button v-on:click="onCheckClick">check</button> </td></tr>
+        </table>
       </div>
     </div>
 
