@@ -32,14 +32,28 @@
         border: 1px solid gray;
         padding: 1rem;
       }
-      table, td, tr {
+      td, tr {
         text-align: center;
+        vertical-align: middle;
+        height: 2rem;
       }
       table {
         width: 100%;
       }
       tr.selected {
-        background-color: blue;
+        background-color: darkblue;
+      }
+
+      input[type="text"] {
+        background: transparent;
+        font-family: "Courier New";
+        box-shadow: none;
+        border: 0;
+        margin: 0;
+        font-size: 1.05rem;
+        color: white;
+        text-align: left;
+        vertical-align: middle;
       }
     </style>
   </head>
@@ -62,9 +76,15 @@
                     v-on:click="onRowClick"
                     v-bind:id="goal.id"
                     v-bind:class="{'selected': (goal.id == selected.id)}">
-              <td>{{ "#"+goal.goal }}</td>
+              <td>#<input v-model="goal.goal" v-bind:id="'i-'+goal.id" type="text"></td>
               <td>{{ goal.streak+" days" }}</td>
               <td>{{ prettyDate(goal.started) }}</td>
+            </tr>
+            <tr v-bind:id="tagData.length"
+                v-bind:class="{'selected': (tagData.length == selected.id)}"            >
+              <td>#<input v-model.trim="newGoal" type="text" align="middle" placeholder="newGoal" v-on:focus="onNewFocused"></td>
+              <td>{{ 0+" days" }}</td>
+              <td>{{ prettyDate(new Date()) }}</td>
             </tr>
           </tbody>
         </table>

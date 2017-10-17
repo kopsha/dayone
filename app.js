@@ -22,18 +22,13 @@ function dateReviver(value) {
 var goalStorage = {
   fetch: function () {
     var goals = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]')
-    console.log( 'attempt from localStorage' )
     goals.forEach(function (goal, index) {
-      console.log( goal )
       var isDate = dateReviver(goal.started)
       if (isDate[0]) {
         goal.started = isDate[1];
       }
 
     })
-
-    goals.push( makeTodayGoal(goals.length) )
-    goalStorage.next_id = goals.length
 
     return goals
   },
@@ -53,6 +48,7 @@ var anApplication = new Vue({
       streak: '',
       started: '',
     },
+    newGoal: ''
   },
   created: function() {
   },
@@ -64,10 +60,27 @@ var anApplication = new Vue({
       this.selected.streak = this.tagData[id].streak;
       this.selected.started = this.tagData[id].started;
     },
-    onCheckClick : function (event) {
+    onCheckClick: function(ev) {
       this.selected.streak += 1
-      this.tagData[this.selected.id].streak = this.selected.streak
+      if (this.selected.id == this.tagData.length) {
+        this.tagData.push({
+            id: this.selected.id,
+            goal: this.selected.goal,
+            streak: this.selected.streak,
+            started: this.selected.started
+          })
+        this.newGoal = ''
+      }
+      else {
+        this.tagData[this.selected.id].streak = this.selected.streak
+      }
       goalStorage.save( this.tagData )
+    },
+    onNewFocused: function(ev) {
+      this.selected.id = this.tagData.length
+      this.selected.goal = this.newGoal
+      this.selected.streak = 0
+      this.selected.started = new Date()
     },
     prettyDate: function (str) {
       var options = { month : "long", day : "numeric" };
@@ -80,4 +93,11 @@ var anApplication = new Vue({
       return str.charAt(0).toUpperCase() + str.slice(1)
     },
   },
+  watch: {
+    newGoal: function() {
+      this.selected.goal = this.newGoal
+      this.selected.streak = 0
+      this.selected.started = new Date()
+    }
+  }
 })
