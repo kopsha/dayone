@@ -11,4 +11,5 @@
 * ~~edit tag~~
 * streak validations
 * check / uncheck behavior
-* remove goal
+* ~~remove goal~~
+* add confirmation on removal

@@ -70,6 +70,7 @@ var anApplication = new Vue({
 		},
 		onDeleteClick: function(ev) {
 			this.goals.splice( this.selectedGoalId, 1 )
+			dataStore.save( this.goals )
 		},
 		onNewFocused: function(ev) {
 			this.selectedGoalId = this.goals.length
