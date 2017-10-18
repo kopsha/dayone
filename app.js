@@ -10,6 +10,16 @@ function dateReviver(value) {
 	
 	return [false, value];
 }
+function treatAsUTC(date) {
+    var result = new Date(date);
+    result.setMinutes(result.getMinutes() - result.getTimezoneOffset());
+    return result;
+}
+function daysBetween(startDate, endDate) {
+    var millisecondsPerDay = 24 * 60 * 60 * 1000;
+    return parseInt((treatAsUTC(endDate) - treatAsUTC(startDate)) / millisecondsPerDay);
+}
+
 var dataStore = {
 	fetch: function () {
 		var localGoals = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]')
@@ -36,18 +46,80 @@ var anApplication = new Vue({
 	data: {
 		showColumns: ['drop', 'goal', 'streak', 'started'],
 		goals: dataStore.fetch(),
-		today: new Date(),
 		newEntry: '',
 		selectedGoalId: 0,
+		wasCheckedToday: false,
 	},
 	created: function() {
+		// perform streak checks ?
+		today = new Date()
+		testDate = new Date()
+		testDate.setDate(today.getDate()-2)
+		this.goals.push({
+			goal: 'invalid',
+			streak: 3,
+			started: testDate
+		})
+		testDate = new Date()
+		testDate.setDate( today.getDate()-3 )
+		this.goals.push({
+			goal: 'alreadyChecked',
+			streak: 3,
+			started: testDate
+		})
+		testDate = new Date()
+		testDate.setDate( today.getDate()-4 )
+		this.goals.push({
+			goal: 'mustCheck',
+			streak: 3,
+			started: testDate
+		})
+		testDate = new Date()
+		testDate.setDate( today.getDate()-5 )
+		this.goals.push({
+			goal: 'streakBroken',
+			streak: 3,
+			started: testDate
+		})
+
+		var toRemove = []
+		this.goals.forEach(function (entry, index) {
+			daysSince = daysBetween(entry.started, today)
+			console.log( entry.goal, "has streak", entry.streak, "and", daysSince, "since started." )
+
+			if (entry.streak > daysSince) {
+				console.log( "entry", entry.goal, "is invalid. Will be removed." )
+				toRemove.push( index )
+			}
+			else {
+				var diff = daysSince - entry.streak
+				if (diff === 1) {
+					console.log( entry.goal+" can be continued." )
+				}
+				else if (diff === 0) {
+					console.log( entry.goal+" was checked today." )
+				}
+				else {
+					console.log( entry.goal+" has broken streak. Will be reset." )
+					entry.started = ''
+					entry.streak = 0
+				}
+			}
+		})
+
+		for (var i = toRemove.length - 1; i >= 0; i--) {
+			console.log( "removing index", toRemove[i] )
+			this.goals.splice( toRemove[i], 1 )
+		}
+
+		this.wasCheckedToday = this.isSelectionChecked()
 	},
 	methods: {
 		addNewGoal: function( name ) {
 			if (name) {
 				this.goals.push({
 					goal: name,
-					started: this.today,
+					started: '',
 					streak: 0,
 				})
 				this.newEntry = ''
@@ -60,12 +132,41 @@ var anApplication = new Vue({
 			var sid = ev.currentTarget.id
 			if (sid != this.selectedGoalId) {
 				this.selectedGoalId = sid
+				this.wasCheckedToday = this.isSelectionChecked()
 			}
 		},
+		isSelectionChecked: function() {
+			var entry = this.goals[this.selectedGoalId]
+			var today = new Date()
+			daysSince = daysBetween(entry.started, today)
+
+			var diff = daysSince - entry.streak
+			if (diff === 0) {
+				return true
+			}
+			return false
+		},
 		onCheckClick: function(ev) {
-			// perform check / uncheck operation
-			// validate shit
-			// and save data
+			var today = new Date()
+			var entry = this.goals[this.selectedGoalId]
+			daysSince = daysBetween(entry.started, today)
+
+			var diff = daysSince - entry.streak
+			if (diff === 1) {
+				entry.streak++
+			}
+			else if (diff === 0) {
+				if (entry.streak > 0) {
+					entry.streak--
+				} else {
+					entry.started = ''
+				}
+			}
+			else {
+				entry.started = today
+				entry.streak = 0
+			}
+			this.wasCheckedToday = this.isSelectionChecked()
 			dataStore.save( this.goals )
 		},
 		onDeleteClick: function(ev) {
@@ -76,9 +177,12 @@ var anApplication = new Vue({
 			this.selectedGoalId = this.goals.length
 		},
 		prettyDate: function (oneDay) {
-			var options = { month : "long", day : "numeric" };
-			var result = oneDay.toLocaleDateString( 'en-GB', options );
-			return result;
+			if (oneDay) {
+				var options = { month : "long", day : "numeric" };
+				var result = oneDay.toLocaleDateString( 'en-GB', options );
+				return result;
+			}
+			else return '--'
 		},
 	},
 	filters: {
