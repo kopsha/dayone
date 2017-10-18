@@ -72,32 +72,35 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="goal in tagData"
+            <tr v-if="goals.length" v-for="(goal, index) in goals"
                     v-on:click="onRowClick"
-                    v-bind:id="goal.id"
-                    v-bind:class="{'selected': (goal.id == selected.id)}">
-              <td>#<input v-model="goal.goal" v-bind:id="'i-'+goal.id" type="text"></td>
+                    v-bind:id="index"
+                    v-bind:class="{'selected': (index == selectedGoalId)}">
+              <td>#<input v-model="goal.goal" type="text"></td>
               <td>{{ goal.streak+" days" }}</td>
               <td>{{ prettyDate(goal.started) }}</td>
             </tr>
-            <tr v-bind:id="tagData.length"
-                v-bind:class="{'selected': (tagData.length == selected.id)}"            >
-              <td>#<input v-model.trim="newGoal" type="text" align="middle" placeholder="newGoal" v-on:focus="onNewFocused"></td>
+            <tr v-bind:id="goals.length"
+                v-bind:class="{'selected': (goals.length == selectedGoalId)}"            >
+              <td>#<input v-model.trim.lazy="newEntry" type="text" placeholder="newGoal" v-on:focus="onNewFocused"></td>
               <td>{{ 0+" days" }}</td>
-              <td>{{ prettyDate(new Date()) }}</td>
+              <td>{{ prettyDate(today) }}</td>
             </tr>
           </tbody>
         </table>
       </div>
 
       <div id="goal-detail-view">
-        <table v-if="selected.id">
-          <tr><td>{{ "#"+selected.goal }}</td></tr>
-          <tr><td>{{ selected.streak+" days" }}</td></tr>
-          <tr><td>{{ "since "+prettyDate(selected.started) }}</td></tr>
-          <tr><td>&nbsp;</td></tr>
-          <tr><td> <button v-on:click="onCheckClick">check</button> </td></tr>
-        </table>
+        <p v-if="goals.length">
+          <table>
+            <tr><td>{{ "#"+goals[selectedGoalId].goal }}</td></tr>
+            <tr><td>{{ goals[selectedGoalId].streak+" days" }}</td></tr>
+            <tr><td>{{ "since "+prettyDate(goals[selectedGoalId].started) }}</td></tr>
+            <tr><td>&nbsp;</td></tr>
+            <tr><td> <button v-on:click="onCheckClick">check</button> </td></tr>
+          </table>
+        </p>
+        <p v-else>Common, don't be shy. Type in something and press enter.</p>
       </div>
     </div>
 

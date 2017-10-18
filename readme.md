@@ -8,5 +8,7 @@
 * ~~goal tag detail~~
 * ~~use localstorage~~
 * ~~add new tag~~
+* ~~edit tag~~
 * streak validations
 * check / uncheck behavior
+* remove goal
