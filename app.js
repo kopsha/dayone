@@ -128,7 +128,7 @@ var anApplication = new Vue({
 				console.log( 'attempted to add an empty goal, request ignored.' )
 			}
 		},
-		onRowHover: function(ev) {
+		onRowClicked: function(ev) {
 			var sid = ev.currentTarget.id
 			if (sid != this.selectedGoalId) {
 				this.selectedGoalId = sid
@@ -170,6 +170,7 @@ var anApplication = new Vue({
 			dataStore.save( this.goals )
 		},
 		onDeleteClick: function(ev) {
+			this.onRowClicked(ev)
 			this.goals.splice( this.selectedGoalId, 1 )
 			dataStore.save( this.goals )
 		},

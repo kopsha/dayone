@@ -81,7 +81,7 @@
           </thead>
           <tbody>
             <tr v-if="goals.length" v-for="(goal, index) in goals"
-                    v-on:mouseover="onRowHover"
+                    v-on:click="onRowClicked"
                     v-bind:id="index"
                     v-bind:class="{'selected': (index == selectedGoalId)}">
               <td><button class="black-button" v-on:click="onDeleteClick" v-bind:id="index">x</button></td>
