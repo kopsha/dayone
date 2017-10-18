@@ -91,7 +91,7 @@
       </div>
 
       <div id="goal-detail-view">
-        <p v-if="goals.length">
+        <p v-if="selectedGoalId < goals.length">
           <table>
             <tr><td>{{ "#"+goals[selectedGoalId].goal }}</td></tr>
             <tr><td>{{ goals[selectedGoalId].streak+" days" }}</td></tr>

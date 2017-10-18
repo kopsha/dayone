@@ -17,11 +17,11 @@ var dataStore = {
 		localGoals.forEach(function (entry, index) {
 			var isDate = dateReviver(entry.started)
 			if (isDate[0]) {
-				cleanData += {
+				cleanData.push({
 					goal: entry.goal,
 					started: isDate[1],
 					streak: entry.streak
-				}
+				})
 			}
 		})
 		return cleanData
@@ -37,8 +37,8 @@ var anApplication = new Vue({
 		showColumns: ['goal', 'streak', 'started'],
 		goals: dataStore.fetch(),
 		today: new Date(),
-		selectedGoalId: '',
-		newEntry: ''
+		newEntry: '',
+		selectedGoalId: 0,
 	},
 	created: function() {
 	},
@@ -55,11 +55,9 @@ var anApplication = new Vue({
 			else {
 				console.log( 'attempted to add an empty goal, request ignored.' )
 			}
-			console.log( 'added new entry: '+name )
 		},
 		onRowClick: function(ev) {
 			this.selectedGoalId = ev.currentTarget.id
-			console.log( 'selected: '+this.selectedGoalId )
 			// and something more
 		},
 		onCheckClick: function(ev) {
@@ -84,7 +82,6 @@ var anApplication = new Vue({
 	},
 	watch: {
 		newEntry: function( text ) {
-			console.log( 'selected before add: '+this.selectedGoalId )
 			this.addNewGoal( text )
 		}
 	}
