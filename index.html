@@ -44,6 +44,14 @@
         background-color: darkblue;
       }
 
+      .black-button {
+        background-color: black;
+        color: white;
+        border-style: dashed;
+        border-width: 1px;
+        border-color: lightblue;
+      }
+
       input[type="text"] {
         background: transparent;
         font-family: "Courier New";
@@ -73,15 +81,17 @@
           </thead>
           <tbody>
             <tr v-if="goals.length" v-for="(goal, index) in goals"
-                    v-on:click="onRowClick"
+                    v-on:mouseover="onRowHover"
                     v-bind:id="index"
                     v-bind:class="{'selected': (index == selectedGoalId)}">
+              <td><button class="black-button" v-on:click="onDeleteClick" v-bind:id="index">x</button></td>
               <td>#<input v-model="goal.goal" type="text"></td>
               <td>{{ goal.streak+" days" }}</td>
               <td>{{ prettyDate(goal.started) }}</td>
             </tr>
             <tr v-bind:id="goals.length"
-                v-bind:class="{'selected': (goals.length == selectedGoalId)}"            >
+                v-bind:class="{'selected': (goals.length == selectedGoalId)}">
+              <td></td>
               <td>#<input v-model.trim.lazy="newEntry" type="text" placeholder="newGoal" v-on:focus="onNewFocused"></td>
               <td>{{ 0+" days" }}</td>
               <td>{{ prettyDate(today) }}</td>
@@ -97,7 +107,7 @@
             <tr><td>{{ goals[selectedGoalId].streak+" days" }}</td></tr>
             <tr><td>{{ "since "+prettyDate(goals[selectedGoalId].started) }}</td></tr>
             <tr><td>&nbsp;</td></tr>
-            <tr><td> <button v-on:click="onCheckClick">check</button> </td></tr>
+            <tr><td> <button v-on:click="onCheckClick">check today</button> </td></tr>
           </table>
         </p>
         <p v-else>Common, don't be shy. Type in something and press enter.</p>

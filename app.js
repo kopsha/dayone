@@ -34,7 +34,7 @@ var dataStore = {
 var anApplication = new Vue({
 	el: '#application',
 	data: {
-		showColumns: ['goal', 'streak', 'started'],
+		showColumns: ['drop', 'goal', 'streak', 'started'],
 		goals: dataStore.fetch(),
 		today: new Date(),
 		newEntry: '',
@@ -56,15 +56,20 @@ var anApplication = new Vue({
 				console.log( 'attempted to add an empty goal, request ignored.' )
 			}
 		},
-		onRowClick: function(ev) {
-			this.selectedGoalId = ev.currentTarget.id
-			// and something more
+		onRowHover: function(ev) {
+			var sid = ev.currentTarget.id
+			if (sid != this.selectedGoalId) {
+				this.selectedGoalId = sid
+			}
 		},
 		onCheckClick: function(ev) {
 			// perform check / uncheck operation
 			// validate shit
 			// and save data
 			dataStore.save( this.goals )
+		},
+		onDeleteClick: function(ev) {
+			this.goals.splice( this.selectedGoalId, 1 )
 		},
 		onNewFocused: function(ev) {
 			this.selectedGoalId = this.goals.length
@@ -82,7 +87,9 @@ var anApplication = new Vue({
 	},
 	watch: {
 		newEntry: function( text ) {
-			this.addNewGoal( text )
+			if (text) {
+				this.addNewGoal( text )
+			}
 		}
 	}
 })
