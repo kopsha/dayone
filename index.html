@@ -32,7 +32,7 @@
             </tr>
             <tr v-bind:id="goals.length"
                 v-bind:class="{'selected': (goals.length == selectedGoalId)}">
-              <td>#<input v-model="newEntry" @change="addNewGoal" type="text" placeholder="one_day_I_will___" v-on:focus="selectedGoalId = goals.length"></td>
+              <td>#<input v-model.trim="newEntry" @change="addNewGoal" type="text" placeholder="one_day" v-on:focus="selectedGoalId = goals.length"></td>
               <td>--</td>
               <td>--</td>
               <td>&nbsp;&nbsp;</td>

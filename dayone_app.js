@@ -43,10 +43,6 @@ var anApplication = new Vue({
 				this.selectedGoalId = sid
 			}
 		},
-		isSelectionChecked: function() {
-			// TODO: redo this
-			return false
-		},
 		onCheckClick: function(ev) {
 			// TODO: redo this
 		},
@@ -58,18 +54,21 @@ var anApplication = new Vue({
 		},
 	    makeDateFromString: function(value) {
 	        const dateFormat = /^\d{4}-\d{2}-\d{2}$/
-	        var isDate = false
 	        if (typeof value === "string" && dateFormat.test(value)) {
 	            isDate = true
-	            return [isDate, new Date(value)]
+	            return new Date(value)
 	        }
-
-	        return [false, value]
+	        return undefined
 	    },
 		computePrettyStreak: function(key) {
+			// TODO: rethink this
 			const start = this.makeDateFromString( this.goals[key].first_check )
+			if (!start) return '--'
+
 			const finish = this.makeDateFromString( this.goals[key].last_check )
-			var days = daysBetween( start, finish )
+			if (!finish) return '--'
+
+			var days = 1+daysBetween( start, finish )
 			return (days == 1) ? 'one day' : `${days} days`
 		},
 		prettyDate: function (oneDay) {

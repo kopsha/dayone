@@ -20,25 +20,22 @@ var LocalGoals = (function ()
     }
     const makeDateFromString = (value) =>
     {
-        const dateFormat = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/
-        var isDate = false
+        const dateFormat = /^\d{4}-\d{2}-\d{2}$/
         if (typeof value === "string" && dateFormat.test(value)) {
-            isDate = true
-            return [isDate, new Date(value)]
+            return new Date(value)
         }
-
-        return [false, value];
-    }
-    const treatAsUTC = (date) =>
-    {
-        var result = new Date(date);
-        result.setMinutes(result.getMinutes() - result.getTimezoneOffset());
-        return result;
+        return undefined
     }
     const daysBetween = (startDate, endDate) =>
     {
-        var millisecondsPerDay = 24 * 60 * 60 * 1000;
-        return parseInt((treatAsUTC(endDate) - treatAsUTC(startDate)) / millisecondsPerDay);
+        const msPerDay = 24 * 60 * 60 * 1000
+        return parseInt( (endDate.getTime() - startDate.getTime()) / msPerDay)
+    }
+    const daysSince = (since) =>
+    {
+        const today = new Date()
+        const aDate = makeDateFromString(since)
+        return daysBetween(aDate, today)
     }
 
     const is_goal_valid = ( name, data ) =>
@@ -54,7 +51,7 @@ var LocalGoals = (function ()
         }
         return true
     }
-    var goals_from_cookies_reducer = function(accumulator, value)
+    const goals_from_cookies_reducer = function(accumulator, value)
     {
         const parts = value.split('=')
         const name = parts[0]
@@ -153,13 +150,13 @@ var LocalGoals = (function ()
 
         for (var entry in goals)
         {
-            var daysSince = daysBetween(goals[entry].last_check, today)
-            console.log( entry, "has ", daysSince, " days since last_check." )
-            if (daysSince === 1) {
+            var days_since = daysSince(goals[entry].last_check)
+            console.log( entry, "has ", days_since, " days since last_check." )
+            if (days_since === 1) {
                 console.log(entry+" can be continued.")
                 assert_true(entry === "mustCheck")
             }
-            else if (daysSince === 0) {
+            else if (days_since === 0) {
                 console.log(entry+" was checked today.")
                 assert_true(entry === "alreadyChecked")
             }
