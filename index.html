@@ -2,99 +2,40 @@
   <head>
     <meta http-equiv="content-type" content="text/html; charset=utf-8" />
     <title>One-day or Day-one? You decide.</title>
-    <script src="https://unpkg.com/vue"></script>
-
-    <style type="text/css">
-      body {
-        background-color: black;
-        color: lightgray;
-      }
-      #application {
-        font-family: "Courier New";
-        border: 1px solid red;
-        padding: 10px;
-        width: 93%;
-        height: 26rem;
-      }
-      #goals-grid-view {
-        display: inline-block;
-        float: left;
-        width: 34rem;
-        height: 20rem;
-        border: 1px solid darkgray;
-        margin-right: 1rem;
-        padding: 1rem;
-      }
-      #goal-detail-view {
-        display: inline-block;
-        width: 13rem;
-        height: 13rem;
-        border: 1px solid gray;
-        padding: 1rem;
-      }
-      td, tr {
-        text-align: center;
-        vertical-align: middle;
-        height: 2rem;
-      }
-      table {
-        width: 100%;
-      }
-      tr.selected {
-        background-color: darkblue;
-      }
-
-      .black-button {
-        background-color: black;
-        color: red;
-        border-style: dashed;
-        border-width: 1px;
-        border-color: blue;
-      }
-
-      input[type="text"] {
-        background: transparent;
-        font-family: "Courier New";
-        box-shadow: none;
-        border: 0;
-        margin: 0;
-        font-size: 1.05rem;
-        color: white;
-        text-align: left;
-        vertical-align: middle;
-      }
-    </style>
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <link rel="stylesheet" type="text/css" href="style.css">
   </head>
   <body>
-    <h1>One day or #dayOne? You decide.</h1>
+    <h1>One day or #dayOne?</h1>
+    <h3>You decide.</h3>
 
     <div id="application">
-      <p>It all begins <strong>here</strong> and <strong>now</strong> or it does not begin at all.</p>
+      <p>It all starts <strong>here</strong> and <strong>now</strong> or it does not start at all.</p>
       <div id="goals-grid-view">
         <table>
           <thead>
             <tr>
               <th v-for="key in showColumns">
-                {{ key | capitalize }}
+                {{ key }}
               </th>
             </tr>
           </thead>
           <tbody>
-            <tr v-if="goals.length" v-for="(goal, index) in goals"
+            <tr v-for="(goal, index) in goals"
                     v-on:click="onRowClicked"
                     v-bind:id="index"
                     v-bind:class="{'selected': (index == selectedGoalId)}">
+              <td>#<input v-model="index" type="text"></td>
+              <td>{{ computePrettyStreak(index) }}</td>
+              <td>{{ prettyDate(goal.first_check) }}</td>
               <td><button class="black-button" v-on:click="onDeleteClick" v-bind:id="index">x</button></td>
-              <td>#<input v-model="goal.goal" type="text"></td>
-              <td>{{ goal.streak+" days" }}</td>
-              <td>{{ prettyDate(goal.started) }}</td>
             </tr>
             <tr v-bind:id="goals.length"
                 v-bind:class="{'selected': (goals.length == selectedGoalId)}">
-              <td></td>
-              <td>#<input v-model.trim.lazy="newEntry" type="text" placeholder="oneDay" v-on:focus="onNewFocused"></td>
+              <td>#<input v-model="newEntry" @change="addNewGoal" type="text" placeholder="one_day_I_will___" v-on:focus="selectedGoalId = goals.length"></td>
               <td>--</td>
               <td>--</td>
+              <td>&nbsp;&nbsp;</td>
             </tr>
           </tbody>
         </table>
@@ -114,6 +55,7 @@
       </div>
     </div>
 
-    <script type = "text/javascript" src = "file:///home/nick/src/dayone/app.js"></script>
+    <script type = "text/javascript" src = "local_goals.js"></script>
+    <script type = "text/javascript" src = "app.js"></script>
   </body>
 </html>
