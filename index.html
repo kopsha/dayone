@@ -21,18 +21,18 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="(goal, index) in goals"
+            <tr v-for="(value, key) in goals"
                     v-on:click="onRowClicked"
-                    v-bind:id="index"
-                    v-bind:class="{'selected': (index == selectedGoalId)}">
-              <td>#<input v-model="index" type="text"></td>
-              <td>{{ computePrettyStreak(index) }}</td>
-              <td>{{ prettyDate(goal.first_check) }}</td>
-              <td><button class="black-button" v-on:click="onDeleteClick" v-bind:id="index">x</button></td>
+                    v-bind:id="key"
+                    v-bind:class="{'selected': (selectedId === key)}">
+              <td>#<input v-model="key" type="text"></td>
+              <td>{{ prettyStreak(key) }}</td>
+              <td>{{ prettyDate(value.last_check) }}</td>
+              <td><button class="black-button" v-on:click="onDeleteClick" v-bind:id="key">x</button></td>
             </tr>
-            <tr v-bind:id="goals.length"
-                v-bind:class="{'selected': (goals.length == selectedGoalId)}">
-              <td>#<input v-model.trim="newEntry" @change="addNewGoal" type="text" placeholder="one_day" v-on:focus="selectedGoalId = goals.length"></td>
+            <tr id="__new_entry__"
+                v-bind:class="{'selected': (selectedId === '__new_entry__')}">
+              <td>#<input v-model.trim="newEntry" @change="addNewGoal" type="text" placeholder="one_day" v-on:focus="selectedId = '__new_entry__'"></td>
               <td>--</td>
               <td>--</td>
               <td>&nbsp;&nbsp;</td>
@@ -42,11 +42,11 @@
       </div>
 
       <div id="goal-detail-view">
-        <p v-if="selectedGoalId < goals.length">
+        <p v-if="selectedId in goals">
           <table>
-            <tr><td>{{ "#"+goals[selectedGoalId].goal }}</td></tr>
-            <tr><td>{{ goals[selectedGoalId].streak+" days" }}</td></tr>
-            <tr><td>{{ "since "+prettyDate(goals[selectedGoalId].started) }}</td></tr>
+            <tr><td>{{ "#"+selectedId }}</td></tr>
+            <tr><td>{{ goals[selectedId].streak+" days" }}</td></tr>
+            <tr><td>{{ "checked "+prettyDate(goals[selectedId].last_check) }}</td></tr>
             <tr><td><p v-if="wasCheckedToday">&#10004;</p></td></tr>
             <tr><td> <button v-on:click="onCheckClick">check today</button> </td></tr>
           </table>

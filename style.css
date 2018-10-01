@@ -18,7 +18,8 @@ h1, h3 {
 #goals-grid-view {
     display: inline-block;
     float: left;
-    width: 34rem;
+    width: 62%;
+    min-width: 34rem;
     height: 20rem;
     border: 1px solid darkgray;
     margin-right: 1rem;
@@ -26,7 +27,8 @@ h1, h3 {
 }
 #goal-detail-view {
     display: inline-block;
-    width: 13rem;
+    width: 28%;
+    min-width: 13rem;
     height: 13rem;
     border: 1px solid gray;
     padding: 1rem;

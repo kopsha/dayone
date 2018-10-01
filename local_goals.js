@@ -2,40 +2,41 @@ var LocalGoals = (function ()
 {
     "use strict";
 
-    const setLastingCookie = (name, value, days = 7) =>
+    const dateIsoFormat = /^\d{4}-\d{2}-\d{2}$/
+    const set_lasting_cookie = (name, value, days = 7) =>
     {
         const expires = new Date(Date.now() + days * 1000*60*60*24).toUTCString()
         document.cookie = name + '=' + encodeURIComponent(value) + '; expires=' + expires
     }
-    const getCookie = (name) =>
+    const get_cookie = (name) =>
     {
         return document.cookie.split('; ').reduce((r, v) => {
-            const parts = v.split('=')
-            return parts[0] === name ? decodeURIComponent(parts[1]) : r
-        }, undefined)
+                const parts = v.split('=')
+                return parts[0] === name ? decodeURIComponent(parts[1]) : r
+            }, undefined)
     }
-    const deleteCookie = (name) =>
+    const delete_cookie = (name) =>
     {
-        setLastingCookie(name, '', -1)
+        set_lasting_cookie(name, '', -1)
     }
-    const makeDateFromString = (value) =>
+    const date_from_string = (value) =>
     {
-        const dateFormat = /^\d{4}-\d{2}-\d{2}$/
-        if (typeof value === "string" && dateFormat.test(value)) {
+        if (typeof value === "string" && dateIsoFormat.test(value))
+        {
             return new Date(value)
         }
         return undefined
     }
-    const daysBetween = (startDate, endDate) =>
+    const days_between = (startDate, endDate) =>
     {
         const msPerDay = 24 * 60 * 60 * 1000
         return parseInt( (endDate.getTime() - startDate.getTime()) / msPerDay)
     }
-    const daysSince = (since) =>
+    const days_since = (since) =>
     {
         const today = new Date()
-        const aDate = makeDateFromString(since)
-        return daysBetween(aDate, today)
+        const aDate = date_from_string(since)
+        return days_between(aDate, today)
     }
 
     const is_goal_valid = ( name, data ) =>
@@ -43,9 +44,8 @@ var LocalGoals = (function ()
         if ((typeof(name) === undefined) ||
             (typeof(data) === undefined) ||
             (name.length <= 0) ||
-            (!('first_check' in data)) ||
             (!('last_check' in data)) ||
-            (!('history' in data)))
+            (!('streak' in data)))
         {
             return false
         }
@@ -85,8 +85,16 @@ var LocalGoals = (function ()
     {
         insert_test_goals()
         var cookies = document.cookie.split('; ')
-        var pgs = cookies.reduce( goals_from_cookies_reducer, {} )
-        return pgs
+        var all_goals = cookies.reduce( goals_from_cookies_reducer, {} )
+        return all_goals
+    }
+    var store_all = function ( goals )
+    {
+        for (var goal in goals)
+        {
+            // TODO: consider to add validation on save
+            set_lasting_cookie( goal, JSON.stringify(goals[goal]) )
+        }
     }
 
     var insert_test_goals = function ()
@@ -99,25 +107,22 @@ var LocalGoals = (function ()
         started.setDate(today.getDate() - 3)
         var goals = {
                 'alreadyChecked' : {
-                    first_check: started.toISOString().substring(0,10),
                     last_check: today.toISOString().substring(0,10),
-                    history: '111'
+                    streak: 10
                 },
                 'mustCheck' : {
-                    first_check: started.toISOString().substring(0,10),
                     last_check: yesterday.toISOString().substring(0,10),
-                    history:'11'
+                    streak: 7
                 },
                 'broken' : {
-                    first_check: started.toISOString().substring(0,10),
                     last_check: started.toISOString().substring(0,10),
-                    history:'1'
+                    streak: 4
                 }
             }
 
         for (var short_name in goals)
         {
-            setLastingCookie(short_name, JSON.stringify(goals[short_name]))
+            set_lasting_cookie(short_name, JSON.stringify(goals[short_name]))
         }
 
     }
@@ -130,17 +135,17 @@ var LocalGoals = (function ()
         console.log( "Existing cookies: >> " + all_cookies + " <<" )
 
         console.log("Testing not existing cookies: " +
-                assert_true(typeof(getCookie("__should_not_be_set__")) === 'undefined'))
+                assert_true(typeof(get_cookie("__should_not_be_set__")) === 'undefined'))
 
-        setLastingCookie('__avoid_any_name_clash__', 0xbeef0101)
-        var actual = getCookie('__avoid_any_name_clash__')
+        set_lasting_cookie('__avoid_any_name_clash__', 0xbeef0101)
+        var actual = get_cookie('__avoid_any_name_clash__')
 
         console.log("Testing set cookies ability: " +
                 assert_true(parseInt(actual) === 0xbeef0101))
 
-        deleteCookie('__avoid_any_name_clash__')
+        delete_cookie('__avoid_any_name_clash__')
         console.log("Testing clean up: " +
-                assert_true(typeof(getCookie('__avoid_any_name_clash__')) === 'undefined'))
+                assert_true(typeof(get_cookie('__avoid_any_name_clash__')) === 'undefined'))
 
         // testing goals
         insert_test_goals()
@@ -150,13 +155,13 @@ var LocalGoals = (function ()
 
         for (var entry in goals)
         {
-            var days_since = daysSince(goals[entry].last_check)
-            console.log( entry, "has ", days_since, " days since last_check." )
-            if (days_since === 1) {
+            var days_past = days_since(goals[entry].last_check)
+            console.log( entry, "has ", days_past, " days since last_check." )
+            if (days_past === 1) {
                 console.log(entry+" can be continued.")
                 assert_true(entry === "mustCheck")
             }
-            else if (days_since === 0) {
+            else if (days_past === 0) {
                 console.log(entry+" was checked today.")
                 assert_true(entry === "alreadyChecked")
             }
@@ -174,6 +179,7 @@ var LocalGoals = (function ()
 
     return {
         fetch_all: fetch_all,
+        store_all: store_all,
         self_check: self_check
     }
 }());
