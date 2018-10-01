@@ -53,6 +53,8 @@ var LocalGoals = (function ()
     }
     const goals_from_cookies_reducer = function(accumulator, value)
     {
+        if (!value) return accumulator
+
         const parts = value.split('=')
         const name = parts[0]
         const data = JSON.parse(decodeURIComponent(parts[1]))
@@ -125,6 +127,10 @@ var LocalGoals = (function ()
                 'broken' : {
                     last_check: started.toISOString().substring(0,10),
                     streak: 4
+                },
+                'willCompleteToday' : {
+                    last_check: yesterday.toISOString().substring(0,10),
+                    streak: 39
                 }
             }
 

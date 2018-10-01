@@ -45,9 +45,9 @@
         <p v-if="selectedId in goals">
           <table>
             <tr><td><h4>{{ "#"+selectedId }}</h4></td></tr>
-            <tr><td>streak: {{ prettyStreak(goals[selectedId].streak) }}</td></tr>
-            <tr><td>checked: {{ prettyCheckDate(selectedId) }}</td></tr>
-            <tr><td><p v-if="wasCheckedToday(selectedId)">&#10004;</p></td></tr>
+            <tr><td><progress v-bind:value="numericStreak(goals[selectedId].streak)" max="40"></progress></td></tr>
+            <tr><td>{{ prettyStreak(goals[selectedId].streak) }} / 40 days</td></tr>
+            <tr><td>today: <strong v-if="wasCheckedToday(selectedId)">&#10004;</strong></td></tr>
             <tr><td> <button v-on:click="onCheckClick">check today</button> </td></tr>
           </table>
         </p>

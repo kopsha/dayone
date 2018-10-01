@@ -1,6 +1,8 @@
 body {
     background-color: black;
     color: lightgray;
+    font-family: Helvetica, Arial, sans-serif;
+    margin: 13px;
 }
 
 h1, h3 {
@@ -29,7 +31,7 @@ h1, h3 {
     display: inline-block;
     width: 28%;
     min-width: 13rem;
-    height: 13rem;
+    height: 16rem;
     border: 1px solid gray;
     padding: 1rem;
 }
@@ -45,12 +47,24 @@ td, tr {
 }
 table {
     width: 100%;
+
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
+
 tr.selected {
     background-color: darkblue;
 }
 table td:first-child {
     text-align: left;
+    min-width: 215px;
+}
+table td:nth-child(2) {
+    min-width: 105px;
+}
+table td:nth-child(3) {
+    min-width: 125px;
 }
 
 .black-button {

@@ -35,7 +35,6 @@ var anApplication = new Vue({
             this.newEntry = ''
             if (newName.match(/^[0-9a-zA-Z_]+$/)) {
                 this.goals[newName] = { last_check: '', streak: 0 }
-                this.selectedId = newName
                 LocalGoals.store_all( this.goals )
             }
             else {
@@ -58,7 +57,20 @@ var anApplication = new Vue({
                 var days_ago = daysBetween(last_check, today)
                 if (days_ago == 0)
                 {
-                    console.log( 'already checked, request ignored.' )
+                    console.log( 'already checked, removing check-mark.' )
+                    this.goals[this.selectedId].streak -= 1
+                    if (this.goals[this.selectedId].streak > 0)
+                    {
+                        var yesterday = new Date()
+                        yesterday.setDate(today.getDate() - 1)
+                        this.goals[this.selectedId].last_check = yesterday.toISOString().substring(0,10)
+                    }
+                    else
+                    {
+                        this.goals[this.selectedId].last_check = ''
+                    }
+                    anApplication.$forceUpdate()
+                    LocalGoals.store_all( this.goals )
                     return
                 }
                 else if (days_ago == 1)
@@ -66,12 +78,15 @@ var anApplication = new Vue({
                     console.log( 'streak continued. woohoo! \\o\/' )
                     this.goals[this.selectedId].last_check = today.toISOString().substring(0,10)
                     this.goals[this.selectedId].streak += 1
+                    LocalGoals.store_all( this.goals )
                     return
                 }
             }
             console.log( 'streak broken. restarting!' )
             this.goals[this.selectedId].last_check = today.toISOString().substring(0,10)
             this.goals[this.selectedId].streak = 1
+            anApplication.$forceUpdate()
+            LocalGoals.store_all( this.goals )
         },
         onDeleteClick: function(event)
         {
@@ -90,6 +105,13 @@ var anApplication = new Vue({
                     return true
             }
             return false
+        },
+        numericStreak: function(streak)
+        {
+            var days = parseInt(streak)
+            if (isNaN(days))
+                return 0
+            return days
         },
         prettyStreak: function(streak)
         {
