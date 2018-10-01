@@ -85,7 +85,6 @@ var LocalGoals = (function ()
 
     var fetch_all = function ()
     {
-        insert_test_goals()
         var cookies = document.cookie.split('; ')
         var all_goals = cookies.reduce( goals_from_cookies_reducer, {} )
         return all_goals
