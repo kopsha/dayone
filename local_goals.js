@@ -161,32 +161,6 @@ var LocalGoals = (function ()
         console.log("Testing clean up: " +
                 assert_true(typeof(get_cookie('__avoid_any_name_clash__')) === 'undefined'))
 
-        // testing goals
-        insert_test_goals()
-        var today = new Date()
-        var goals = fetch_all()
-        assert_true(Object.keys(goals).length >= 3)
-
-        for (var entry in goals)
-        {
-            var days_past = days_since(goals[entry].last_check)
-            console.log( entry, "has ", days_past, " days since last_check." )
-            if (days_past === 1) {
-                console.log(entry+" can be continued.")
-                assert_true(entry === "mustCheck")
-            }
-            else if (days_past === 0) {
-                console.log(entry+" was checked today.")
-                assert_true(entry === "alreadyChecked")
-            }
-            else {
-                console.log( entry+" has broken streak, should be restarted." )
-                assert_true(entry === "broken")
-            }
-        }
-
-        // TODO: remove test goals
-
         // summarize
         console.log(`Out of ${_passed_asserts+_failed_asserts} total tests ${_passed_asserts} did passed and ${_failed_asserts} failed.`)
     }
