@@ -26,8 +26,8 @@
                     v-bind:id="key"
                     v-bind:class="{'selected': (selectedId === key)}">
               <td>#<input v-model="key" type="text"></td>
-              <td>{{ prettyStreak(key) }}</td>
-              <td>{{ prettyDate(value.last_check) }}</td>
+              <td>{{ prettyStreak(goals[key].streak) }}</td>
+              <td>{{ humanizeCheckDate(key) }}</td>
               <td><button class="black-button" v-on:click="onDeleteClick" v-bind:id="key">x</button></td>
             </tr>
             <tr id="__new_entry__"
@@ -44,10 +44,10 @@
       <div id="goal-detail-view">
         <p v-if="selectedId in goals">
           <table>
-            <tr><td>{{ "#"+selectedId }}</td></tr>
-            <tr><td>{{ goals[selectedId].streak+" days" }}</td></tr>
-            <tr><td>{{ "checked "+prettyDate(goals[selectedId].last_check) }}</td></tr>
-            <tr><td><p v-if="wasCheckedToday">&#10004;</p></td></tr>
+            <tr><td><h4>{{ "#"+selectedId }}</h4></td></tr>
+            <tr><td>streak: {{ prettyStreak(goals[selectedId].streak) }}</td></tr>
+            <tr><td>checked: {{ prettyCheckDate(selectedId) }}</td></tr>
+            <tr><td><p v-if="wasCheckedToday(selectedId)">&#10004;</p></td></tr>
             <tr><td> <button v-on:click="onCheckClick">check today</button> </td></tr>
           </table>
         </p>

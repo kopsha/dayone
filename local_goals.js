@@ -35,7 +35,7 @@ var LocalGoals = (function ()
     const days_since = (since) =>
     {
         const today = new Date()
-        const aDate = date_from_string(since)
+        const aDate = dateIsoFormat.test(since) ? date_from_string(since) : today
         return days_between(aDate, today)
     }
 
@@ -88,8 +88,16 @@ var LocalGoals = (function ()
         var all_goals = cookies.reduce( goals_from_cookies_reducer, {} )
         return all_goals
     }
+    var delete_all = function ()
+    {
+        var cookies = document.cookie.split('; ')
+        var all_goals = cookies.reduce( goals_from_cookies_reducer, {} )
+        for (var goal in all_goals)
+            delete_cookie( goal )
+    }
     var store_all = function ( goals )
     {
+        delete_all()
         for (var goal in goals)
         {
             // TODO: consider to add validation on save
